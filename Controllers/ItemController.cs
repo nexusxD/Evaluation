@@ -59,10 +59,10 @@ namespace Evaluation.Controllers
     {
       return Ok(await _itemService.GetItemByUserId(userId));
     }
-    [HttpGet("Trade/{userIdFrom}/{userIdTo}/{idFrom}/{idTo}/{quantity}")]
-    public async Task<ActionResult<ServiceResponse<List<GetItemDto>>>> Trade(int userIdFrom, int userIdTo, int idFrom, int idTo, int quantity)
+    [HttpGet("Trade/{userIdFrom}/{userIdTo}/{idFrom}/{quantity}")]
+    public async Task<ActionResult<ServiceResponse<List<GetItemDto>>>> Trade(int userIdFrom, int userIdTo, int idFrom, int quantity)
     {
-      return Ok(await _itemService.Trade(userIdFrom, userIdTo, idFrom, idTo, quantity));
+      return Ok(await _itemService.Trade(userIdFrom, userIdTo, idFrom,quantity));
     }
   }
 }

@@ -113,27 +113,28 @@ namespace Evaluation.Services.ItemService
       }
 
     }
-    public async Task<ServiceResponse<List<GetItemDto>>> Trade(int userIdFrom, int userIdTo, int idFrom, int idTo, int quantity)
+    public async Task<ServiceResponse<List<GetItemDto>>> Trade(int userIdFrom, int userIdTo, int idFrom, int quantity)
     {
+      Counter.counter=0;
       var serviceResponse = new ServiceResponse<List<GetItemDto>>();
-      var olditem = items.Where(i => i.ItemId == idFrom).FirstOrDefault();
-      olditem.ItemId = idTo;
-      olditem.Name = olditem.Name;
-      olditem.Description = olditem.Description;
-      var quantityAux = olditem.Quantity;
+      //nuevo item a crear
+      var newItem = items.Where(i => i.ItemId == idFrom).FirstOrDefault();
+      newItem.ItemId = items.Max(i=>i.ItemId)+1;
+      newItem.Name = newItem.Name;
+      newItem.Description = newItem.Description;
+      var quantityAux = newItem.Quantity;
       Counter.counter = Counter.counter + quantity;
-      olditem.Quantity = Counter.counter;
-      olditem.UserId = userIdTo;
-      var itemDelete = items.Where(i => i.ItemId == idTo).FirstOrDefault();
-      items.Remove(itemDelete);
-      items.OrderBy(i => i.ItemId);
-      List<Item> itemsAux = new List<Item> {
-        new Item{ItemId=idFrom, Name=olditem.Name, Description=olditem.Description, Quantity=quantityAux-quantity, UserId=userIdFrom},
-       };
-      itemsAux.Add(olditem);
-      items.AddRange(itemsAux);
-      serviceResponse.Data = itemsAux.Select(i => _mapper.Map<GetItemDto>(i)).ToList();
+      newItem.Quantity = Counter.counter;
+      newItem.UserId = userIdTo;
+      
+      //Item que ya existe en la lista
+      Item item = new Item {ItemId=idFrom, Name=newItem.Name, Description=newItem.Description, Quantity=quantityAux-quantity, UserId=userIdFrom};
+      
+      items.Add(item);
+      var itemsOrder = items.OrderBy(i => i.ItemId).ToList();
+      serviceResponse.Data = itemsOrder.Select(i => _mapper.Map<GetItemDto>(i)).ToList();
       return serviceResponse;
+
     }
 
   }

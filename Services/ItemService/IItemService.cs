@@ -13,6 +13,6 @@ namespace Evaluation.Services.ItemService
         Task<ServiceResponse<GetItemDto>> EditItem(EditItemDto editedItem);
         Task<ServiceResponse<List<GetItemDto>>> DeleteItem(int id);
         Task<ServiceResponse<List<GetItemDto>>> GetItemByUserId(int userId);
-        Task<ServiceResponse<List<GetItemDto>>> Trade(int userIdFrom, int userIdTo, int idFrom, int idTo, int quantity);
+        Task<ServiceResponse<List<GetItemDto>>> Trade(int userIdFrom, int userIdTo, int idFrom, int quantity);
     }
 }
