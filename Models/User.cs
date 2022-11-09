@@ -11,5 +11,6 @@ namespace Evaluation.Models
         public string Email { get; set; } = "pato@patomail.com";
         public long Phone { get; set; } = 1234567890;
         public UserType Type { get; set; } = UserType.Comprador;
+        public List<Item>? Items { get; set;}
     }
 }

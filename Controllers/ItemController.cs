@@ -34,7 +34,7 @@ namespace Evaluation.Controllers
     {
       return Ok(await _itemService.AddItem(newItem));
     }
-    [HttpDelete("Delete")]
+    [HttpDelete("Delete/{id}")]
     public async Task<ActionResult<ServiceResponse<List<GetItemDto>>>> DeleteItem(int id)
     {
       var response = await _itemService.DeleteItem(id);

@@ -2,30 +2,29 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using Evaluation.Data;
 using Evaluation.Dtos.User;
+using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.Services.UserService
 {
   public class UserService : IUserService
   {
-    private static List<User> usuarios = new List<User>
-        {
-            new User(),
-            new User{ UserId=1, Name="Pata", Email="pata@patamail.com", Phone=9876543210, Type=UserType.Vendedor}
-        };
     private readonly IMapper _mapper;
+    private readonly DataContext _context;
 
-    public UserService(IMapper mapper)
+    public UserService(IMapper mapper, DataContext context)
     {
       _mapper = mapper;
+      _context = context;
     }
     public async Task<ServiceResponse<List<GetUserDto>>> AddUser(AddUserDto newUser)
     {
       var serviceResponse = new ServiceResponse<List<GetUserDto>>();
       User user = _mapper.Map<User>(newUser);
-      user.UserId = usuarios.Max(u => u.UserId) + 1;
-      usuarios.Add(user);
-      serviceResponse.Data = usuarios.Select(u => _mapper.Map<GetUserDto>(u)).ToList();
+      _context.Users.Add(user);
+      await _context.SaveChangesAsync();
+      serviceResponse.Data = await _context.Users.Select(u => _mapper.Map<GetUserDto>(u)).ToListAsync();
       return serviceResponse;
     }
 
@@ -34,10 +33,10 @@ namespace Evaluation.Services.UserService
       var serviceResponse = new ServiceResponse<List<GetUserDto>>();
       try
       {
-        var usuarioDelete = usuarios.First(u => u.UserId == id);
-        usuarios.Remove(usuarioDelete);
-        var usuariosOrder = usuarios.OrderBy(u => u.UserId).ToList();
-        serviceResponse.Data = usuariosOrder.Select(u => _mapper.Map<GetUserDto>(u)).ToList();
+        var usuarioDelete = await _context.Users.FirstAsync(u => u.UserId == id);
+        _context.Users.Remove(usuarioDelete);
+        await _context.SaveChangesAsync();
+        serviceResponse.Data = _context.Users.Select(u => _mapper.Map<GetUserDto>(u)).ToList();
       }
       catch (Exception ex)
       {
@@ -52,12 +51,14 @@ namespace Evaluation.Services.UserService
       var serviceResponse = new ServiceResponse<GetUserDto>();
       try
       {
-        var editedUsuario = usuarios.FirstOrDefault(u => u.UserId == editedUser.UserId);
+        var editedUsuario = await _context.Users.FirstOrDefaultAsync(u => u.UserId == editedUser.UserId);
 
         editedUsuario.Name = editedUser.Name;
         editedUsuario.Email = editedUser.Email;
         editedUsuario.Phone = editedUser.Phone;
         editedUsuario.Type = editedUser.Type;
+
+        await _context.SaveChangesAsync();
 
         serviceResponse.Data = _mapper.Map<GetUserDto>(editedUsuario);
       }
@@ -72,16 +73,16 @@ namespace Evaluation.Services.UserService
     public async Task<ServiceResponse<List<GetUserDto>>> GetAllUsers()
     {
       var serviceResponse = new ServiceResponse<List<GetUserDto>>();
-      var usuariosOrder = usuarios.OrderBy(u => u.UserId).ToList();
-      serviceResponse.Data = usuariosOrder.Select(u => _mapper.Map<GetUserDto>(u)).ToList();
+      var dbUsers = await _context.Users.ToListAsync();
+      serviceResponse.Data = dbUsers.Select(u => _mapper.Map<GetUserDto>(u)).ToList();
       return serviceResponse;
     }
 
     public async Task<ServiceResponse<GetUserDto>> GetUserById(int id)
     {
       var serviceResponse = new ServiceResponse<GetUserDto>();
-      var usuario = usuarios.FirstOrDefault(u => u.UserId == id);
-      serviceResponse.Data = _mapper.Map<GetUserDto>(usuario);
+      var dbUsers = await _context.Users.FirstOrDefaultAsync(u => u.UserId == id);
+      serviceResponse.Data = _mapper.Map<GetUserDto>(dbUsers);
       return serviceResponse;
     }
 

@@ -14,5 +14,6 @@ namespace Evaluation.Data
         }
         
         public DbSet<User> Users => Set<User>();
+        public DbSet<Item> Items => Set<Item>();
     }
 }
