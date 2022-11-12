@@ -17,6 +17,7 @@ namespace Evaluation.Controllers
     {
       _userService = userService;
     }
+    
     [HttpGet("All")]
     public async Task<ActionResult<ServiceResponse<List<GetUserDto>>>> Get()
     {
